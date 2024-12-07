@@ -1,5 +1,6 @@
 package funkin.backend.scripting;
 
+import hscript.Expr.ModuleDecl;
 import haxe.io.Path;
 import hscript.Expr.Error;
 import hscript.Parser;
@@ -72,20 +73,21 @@ class HScript extends Script {
 				return true; // no need to reimport again
 			if (Assets.exists(p)) {
 				var code = Assets.getText(p);
-				var expr:Expr = null;
+				var module:Array<ModuleDecl> = null;
 				try {
 					if (code != null && code.trim() != "") {
 						parser.line = 1; // fun fact: this is all you need to reuse a parser without issues. all the other vars get reset on parse.
-						expr = parser.parseString(code, cl.join("/") + "." + hxExt);
+						module = parser.parseModule(code, cl.join("/") + "." + hxExt);
 					}
 				} catch(e:Error) {
 					_errorHandler(e);
 				} catch(e) {
 					_errorHandler(new Error(ECustom(e.toString()), 0, 0, fileName, 0));
 				}
-				if (expr != null) {
-					@:privateAccess
-					interp.exprReturn(expr);
+				if (module != null) {
+					//@:privateAccess
+					//interp.exprReturn(expr);
+					interp.registerModule(module);
 					__importedPaths.push(p);
 				}
 				return true;
