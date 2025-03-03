@@ -107,7 +107,7 @@ class Strum extends FlxSprite {
 
 		updateNotePos(daNote);
 		for (field in extraCopyFields)
-			Reflect.setProperty(daNote, field, Reflect.getProperty(this, field));
+			CoolUtil.cloneProperty(daNote, field, this); // TODO: make this cached to reduce the reflection calls - Neo
 	}
 
 	private inline function updateNotePos(daNote:Note) {
