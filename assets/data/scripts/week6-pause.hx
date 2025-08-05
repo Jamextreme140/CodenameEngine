@@ -17,7 +17,7 @@ function create(event) {
 	// cancel default pause menu!!
 	event.cancel();
 
-	event.music = isThorns ? "pixel/LunchboxScary" : "pixel/Lunchbox";
+	event.music = isThorns ? "pixel/LunchboxScary" : "pixel/breakfast";
 
 	// allowing this pause script even if the pixel script is not loaded  - Nex
 	pixelScript?.call("pixelCam", [pauseCam]);

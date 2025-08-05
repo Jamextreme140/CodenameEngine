@@ -21,6 +21,8 @@ Codename Engine is a new Friday Night Funkin' Engine aimed at simplifying moddin
 Latest builds for the engine can be found in the [Actions](https://github.com/YoshiCrafter29/CodenameEngine/actions) tab.<br>
 In the future (when the engine won't be a WIP anymore) we're gonna also publish the engine on platforms like Gamebanana; stay tuned!
 
+If you don't have a github account please go onto https://fnf-cne-devs.github.io/ and click the download button for the respective operating system.
+
 <details>
   <summary><h2>How to build</h2></summary>
 
@@ -76,7 +78,7 @@ In the future (when the engine won't be a WIP anymore) we're gonna also publish 
   - Steal code from Codename Engine for another different project that is not Codename Engine related (Codename Engine mods excluded) without properly crediting
   - Release the entire Codename Engine on platforms (Mods that use Codename Engine as source are fine, if it's specified even better)
 
-  #### *If you need more info or feel like asking to do something which is not listed here, ask us directly on our discord (linked in the wiki)!*
+  #### *If you need more info or feel like asking to do something which is not listed here, ask us directly on our discord (linked on the website)!*
 </details>
 
 <details>

@@ -1,9 +1,13 @@
 package funkin.options;
 
-import openfl.Lib;
-import flixel.util.FlxSave;
 import flixel.input.keyboard.FlxKey;
+import flixel.util.FlxSave;
+import openfl.Lib;
 
+/**
+ * The save data of the engine.
+ * Mod save data is stored in `FlxG.save.data`.
+**/
 @:build(funkin.backend.system.macros.OptionsMacro.build())
 @:build(funkin.backend.system.macros.FunkinSaveMacro.build("__save", "__flush", "__load"))
 class Options
@@ -25,16 +29,27 @@ class Options
 	public static var autoPause:Bool = true;
 	public static var antialiasing:Bool = true;
 	public static var volume:Float = 1;
+	public static var volumeMusic:Float = 1;
+	public static var volumeSFX:Float = 1;
 	public static var week6PixelPerfect:Bool = true;
 	public static var gameplayShaders:Bool = true;
 	public static var colorHealthBar:Bool = true;
 	public static var lowMemoryMode:Bool = false;
+	public static var devMode:Bool = false;
 	public static var betaUpdates:Bool = false;
 	public static var splashesEnabled:Bool = true;
 	public static var hitWindow:Float = 250;
 	public static var songOffset:Float = 0;
 	public static var framerate:Int = 120;
 	public static var gpuOnlyBitmaps:Bool = #if (mac || web) false #else true #end; // causes issues on mac and web
+	public static var language = "en"; // default to english, Flags.DEFAULT_LANGUAGE should not modify this
+	public static var streamedMusic:Bool = true;
+	public static var streamedVocals:Bool = false;
+	public static var quality:Int = 1;
+	public static var allowConfigWarning:Bool = true;
+	#if MODCHARTING_FEATURES
+	public static var modchartingHoldSubdivisions:Int = 4;
+	#end
 
 	public static var lastLoadedMod:String = null;
 
@@ -43,15 +58,22 @@ class Options
 	 */
 	public static var intensiveBlur:Bool = true;
 	public static var editorSFX:Bool = true;
-	public static var editorPrettyPrint:Bool = false;
+
+	public static var editorCharterPrettyPrint:Bool = false;
+	public static var editorCharacterPrettyPrint:Bool = true;
+	public static var editorStagePrettyPrint:Bool = true;
+
+	public static var editorsResizable:Bool = true;
+	public static var bypassEditorsResize:Bool = false;
 	public static var maxUndos:Int = 120;
+	public static var songOffsetAffectEditors:Bool = false;
 
 	/**
 	 * QOL FEATURES
 	 */
 	public static var freeplayLastSong:String = null;
 	public static var freeplayLastDifficulty:String = "normal";
-	public static var contributors:Array<funkin.backend.system.github.GitHubContributor> = [];
+	public static var contributors:Array<funkin.backend.system.github.GitHubContributor.CreditsGitHubContributor> = [];
 	public static var mainDevs:Array<Int> = [];  // IDs
 	public static var lastUpdated:Null<Float>;
 
@@ -62,17 +84,26 @@ class Options
 	public static var charterShowSections:Bool = true;
 	public static var charterShowBeats:Bool = true;
 	public static var charterEnablePlaytestScripts:Bool = true;
+	public static var charterRainbowWaveforms:Bool = false;
 	public static var charterLowDetailWaveforms:Bool = false;
 	public static var charterAutoSaves:Bool = true;
 	public static var charterAutoSaveTime:Float = 60*5;
 	public static var charterAutoSaveWarningTime:Float = 5;
-	public static var charterAutoSavesSeperateFolder:Bool = false;
+	public static var charterAutoSavesSeparateFolder:Bool = false;
 
 	/**
-	* PLAYER 1 CONTROLS
-	*/
+	 * CHARACTER EDITOR
+	 */
+	public static var stageSelected:String = null;
+	public static var characterHitbox:Bool = true;
+	public static var characterCamera:Bool = true;
+	public static var characterAxis:Bool = true;
+	public static var characterDragging:Bool = true;
+	public static var playAnimOnOffset:Bool = false;
 
-	// Notes
+	/**
+	 * PLAYER 1 CONTROLS
+	 */
 	public static var P1_NOTE_LEFT:Array<FlxKey> = [A];
 	public static var P1_NOTE_DOWN:Array<FlxKey> = [S];
 	public static var P1_NOTE_UP:Array<FlxKey> = [W];
@@ -90,12 +121,14 @@ class Options
 	// Misc
 	public static var P1_RESET:Array<FlxKey> = [R];
 	public static var P1_SWITCHMOD:Array<FlxKey> = [TAB];
-	public static var P1_VOLUME_UP:Array<FlxKey> = [];
-	public static var P1_VOLUME_DOWN:Array<FlxKey> = [];
-	public static var P1_VOLUME_MUTE:Array<FlxKey> = [];
+	public static var P1_VOLUME_UP:Array<FlxKey> = [PLUS];
+	public static var P1_VOLUME_DOWN:Array<FlxKey> = [MINUS];
+	public static var P1_VOLUME_MUTE:Array<FlxKey> = [ZERO];
 
 	// Debugs
-	public static var P1_DEBUG_RELOAD:Array<FlxKey> = [F5];
+	public static var P1_DEV_ACCESS:Array<FlxKey> = [SEVEN];
+	public static var P1_DEV_CONSOLE:Array<FlxKey> = [F2];
+	public static var P1_DEV_RELOAD:Array<FlxKey> = [F5];
 
 	/**
 	* PLAYER 2 CONTROLS (ALT)
@@ -124,7 +157,9 @@ class Options
 	public static var P2_VOLUME_MUTE:Array<FlxKey> = [NUMPADZERO];
 
 	// Debugs
-	public static var P2_DEBUG_RELOAD:Array<FlxKey> = [];
+	public static var P2_DEV_ACCESS:Array<FlxKey> = [];
+	public static var P2_DEV_CONSOLE:Array<FlxKey> = [];
+	public static var P2_DEV_RELOAD:Array<FlxKey> = [];
 
 	/**
 	* SOLO GETTERS
@@ -153,16 +188,27 @@ class Options
 	public static var SOLO_VOLUME_MUTE(get, null):Array<FlxKey>;
 
 	// Debugs
-	public static var SOLO_DEBUG_RELOAD(get, null):Array<FlxKey>;
+	public static var SOLO_DEV_ACCESS(get, null):Array<FlxKey>;
+	public static var SOLO_DEV_CONSOLE(get, null):Array<FlxKey>;
+	public static var SOLO_DEV_RELOAD(get, null):Array<FlxKey>;
 
 	public static function load() {
+		var path = haxe.macro.Compiler.getDefine("SAVE_OPTIONS_PATH"), name = haxe.macro.Compiler.getDefine("SAVE_OPTIONS_NAME");
+		if (path == null) path = 'CodenameEngine';
+		if (name == null) name = 'options';
+
 		if (__save == null) __save = new FlxSave();
-		__save.bind("options", "CodenameEngine");
+		__save.bind(name, path);
 		__load();
 
 		if (!__eventAdded) {
 			Lib.application.onExit.add(function(i:Int) {
-				trace("Saving settings...");
+				Logs.traceColored([
+					Logs.getPrefix("Options"),
+					Logs.logText("Saving "),
+					Logs.logText("settings", GREEN),
+					Logs.logText("...")
+				], VERBOSE);
 				save();
 			});
 			__eventAdded = true;
@@ -173,9 +219,23 @@ class Options
 
 	public static function applySettings() {
 		applyKeybinds();
-		FlxG.game.stage.quality = (FlxG.enableAntialiasing = antialiasing) ? LOW : BEST;
+
+		switch (quality) {
+			case 0:
+				antialiasing = false;
+				lowMemoryMode = true;
+				gameplayShaders = false;
+			case 1:
+				antialiasing = true;
+				lowMemoryMode = false;
+				gameplayShaders = true;
+		}
+
+		FlxG.sound.defaultMusicGroup.volume = volumeMusic;
+		FlxG.game.stage.quality = (FlxG.enableAntialiasing = antialiasing) ? BEST : LOW;
 		FlxG.autoPause = autoPause;
-		FlxG.drawFramerate = FlxG.updateFramerate = framerate;
+		if (FlxG.updateFramerate < framerate) FlxG.drawFramerate = FlxG.updateFramerate = framerate;
+		else FlxG.updateFramerate = FlxG.drawFramerate = framerate;
 	}
 
 	public static function applyKeybinds() {
