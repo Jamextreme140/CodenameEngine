@@ -136,7 +136,14 @@ class Flags {
 	public static var DEFAULT_CAM_ZOOM_STRENGTH:Int = 1;
 	public static var DEFAULT_CAM_ZOOM:Float = 1.05; // what zoom level it defaults to
 	public static var DEFAULT_HUD_ZOOM:Float = 1.0;
-	public static var MAX_CAMERA_ZOOM_MULT:Float = 1.35;
+	public static var DEFAULT_ZOOM:Float = 1.0;
+	public static var DEFAULT_ZOOM_LERP:Float = 0.05;
+	public static var MAX_CAMERA_ZOOM_MULT:Float = 10;
+	public static var USE_CAM_ZOOM_MULT:Bool = true;
+	public static var DEFAULT_CAM_ZOOM_MULT:Float = 0.015;
+	public static var DEFAULT_HUD_ZOOM_MULT:Float = 0.03;
+	public static var DEFAULT_CAM_ZOOM_LERP:Float = 0.05;
+	public static var DEFAULT_HUD_ZOOM_LERP:Float = 0.05;
 
 	// to translate these you need to convert them into ids
 	// Resume -> pause.resume
@@ -163,11 +170,6 @@ class Flags {
 
 	public static var DEFAULT_INTRO_LENGTH:Int = 5;
 	public static var DEFAULT_INTRO_SPRITES:Array<String> = [null, 'game/ready', 'game/set', 'game/go'];
-
-	public static var CAM_BOP_STRENGTH:Float = 0.015;
-	public static var HUD_BOP_STRENGTH:Float = 0.03;
-	public static var DEFAULT_CAM_ZOOM_LERP:Float = 0.05;
-	public static var DEFAULT_HUD_ZOOM_LERP:Float = 0.05;
 
 	public static var MAX_SPLASHES:Int = 8;
 	public static var STUNNED_TIME:Float = 5 / 60;
