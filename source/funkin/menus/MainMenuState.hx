@@ -127,7 +127,7 @@ class MainMenuState extends MusicBeatState
 				}
 				FlxTween.completeTweensOf(devModeWarning);
 				FlxTween.color(devModeWarning, 0.2, 0xFFFF0000, 0xFFFFFFFF);
-				FlxTween.shake(devModeWarning, 0.005);
+				FlxTween.shake(devModeWarning, 0.005, 0.3);
 				devModeWarning.y = FlxG.height - 75;
 				FlxTween.tween(devModeWarning, {y: FlxG.height - 50}, 0.4);
 			}
