@@ -26,8 +26,8 @@ class Flags {
 	public static var MOD_DOWNLOAD_LINK:String  = "";
 	public static var MOD_DEPENDENCIES:Array<String> = [];
 
-	@:noCompletion public static var MOD_ICON64:String = "";
 	@:noCompletion public static var MOD_ICON32:String = "";
+	@:noCompletion public static var MOD_ICON24:String = "";
 	@:noCompletion public static var MOD_ICON16:String = "";
 	public static var MOD_ICON:String = "";
 
@@ -46,6 +46,7 @@ class Flags {
 	public static var COMMIT_HASH:String = GitCommitMacro.commitHash;
 	public static var COMMIT_MESSAGE:String = 'Commit $COMMIT_NUMBER ($COMMIT_HASH)';
 
+	@:bypass public static var WINDOW_TITLE_USE_MOD_NAME:Bool = false;
 	@:lazy public static var TITLE:String = Application.current.meta.get('name');
 	@:lazy public static var VERSION:String = Application.current.meta.get('version');
 
@@ -283,6 +284,8 @@ class Flags {
 					else trace('Invalid section $name');
 			}
 		}
+
+		if (!flags.exists("WINDOW_TITLE_USE_MOD_NAME")) flags.set("WINDOW_TITLE_USE_MOD_NAME", flags.exists('TITLE') ? 'false' : 'true');
 	}
 
 	public static function loadFromDatas(datas:Array<String>) {
