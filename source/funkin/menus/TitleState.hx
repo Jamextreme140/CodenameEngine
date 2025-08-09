@@ -157,7 +157,7 @@ class TitleState extends MusicBeatState
 
 	function goToMainMenu(force = true) {
 		#if UPDATE_CHECKING
-		if (!force) {
+		if (!force && !Flags.DISABLE_AUTOUPDATER) {
 			funkin.backend.system.updating.UpdateUtil.waitForUpdates(false, (report) -> {
 				hasCheckedUpdates = true;
 				if (FlxG.state != this) return;

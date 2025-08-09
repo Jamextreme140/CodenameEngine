@@ -29,9 +29,6 @@ final class WindowUtils {
 	public static inline function resetClosing() __triedClosing = false;
 
 	@:dox(hide) public static inline function init() {
-		resetTitle();
-		resetClosing();
-
 		Lib.application.window.onClose.add(function () {
 			if (preventClosing && !__triedClosing) {
 				Lib.application.window.onClose.cancel();
