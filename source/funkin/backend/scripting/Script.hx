@@ -28,6 +28,11 @@ class Script extends FlxBasic implements IFlxDestroyable {
 			"Reflect"			=> Reflect,
 			"StringTools"		=> StringTools,
 			"Json"				=> haxe.Json,
+			"Xml"				=> Xml,
+			"Type"				=> Type,
+			"Date"				=> Date,
+			"Lambda"			=> Lambda,
+			"Sys"				=> Sys,
 
 			// OpenFL & Lime related stuff
 			"Assets"			=> openfl.utils.Assets,

@@ -1,0 +1,158 @@
+name: Create Release Builds
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: "Release name (e.g. v1.0.5 or v1.2-rc1)"
+        required: true
+      prerelease:
+        description: "Is this a prerelease?"
+        required: true
+        type: boolean
+
+jobs:
+  collect-release:
+    name: Release ${{ github.event.inputs.tag_name }} Builds
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Windows Full Build
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: windows.yml
+          name: Codename Engine
+          path: artifacts/windows/full_build
+          allow_forks: false
+
+      - name: Download Windows Executable
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: windows.yml
+          name: Codename Engine (Executable Only)
+          path: artifacts/windows/executable
+          allow_forks: false
+
+      - name: Download macOS Full Build
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: macos.yml
+          name: Codename Engine
+          path: artifacts/macos/full_build
+          allow_forks: false
+
+      - name: Download macOS Executable
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: macos.yml
+          name: Codename Engine (Executable Only)
+          path: artifacts/macos/executable
+          allow_forks: false
+
+      - name: Download Linux Full Build
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: linux.yml
+          name: Codename Engine
+          path: artifacts/linux/full_build
+          allow_forks: false
+
+      - name: Download Linux Executable
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: linux.yml
+          name: Codename Engine (Executable Only)
+          path: artifacts/linux/executable
+          allow_forks: false
+
+      - name: Prepare artifacts
+        run: |
+          mkdir -p renamed
+
+          # Windows
+          mv artifacts/windows/executable/CodenameEngine.exe renamed/update-windows.exe
+          cd artifacts/windows/full_build
+          zip -r ../../../renamed/"Codename Engine-Windows.zip" *
+          cd -
+
+          # macOS
+          mv artifacts/macos/executable/CodenameEngine renamed/update-mac
+          cd artifacts/macos/full_build
+          if [ -f CodenameEngine.tar.gz ]; then
+            # Keep tar.gz as-is
+            cp CodenameEngine.tar.gz ../../../renamed/"Codename Engine-Mac.tar.gz"
+          else
+            # Zip contents at root
+            zip -r ../../../renamed/"Codename Engine-Mac.zip" *
+          fi
+          cd -
+
+          # Linux
+          mv artifacts/linux/executable/CodenameEngine renamed/update-linux
+          cd artifacts/linux/full_build
+          zip -r ../../../renamed/"Codename Engine-Linux.zip" *
+          cd -
+
+      - name: Find Base Release
+        id: get_base_release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Looking for base release..."
+          PRERELEASE="${{ github.event.inputs.prerelease }}"
+
+          if [[ "$PRERELEASE" == "true" ]]; then
+            BASE=$(gh release list --repo ${{ github.repository }} --json tagName,isPrerelease,isDraft \
+              -L 50 -q '.[] | select(.isPrerelease==false and .isDraft==false) | .tagName' | head -n 1)
+
+            if [ -z "$BASE" ]; then
+              echo "No stable release found, resorting to prereleases"
+              BASE=$(gh release list --repo ${{ github.repository }} --json tagName,isDraft \
+                -L 1 -q '.[] | select(.isDraft==false) | .tagName')
+            fi
+          else
+            BASE=$(gh release list --repo ${{ github.repository }} --json tagName,isPrerelease,isDraft \
+              -L 50 -q '.[] | select(.isPrerelease==false and .isDraft==false) | .tagName' | head -n 1)
+          fi
+
+          echo "Base release: $BASE"
+          echo "base_release=$BASE" >> $GITHUB_OUTPUT
+
+      - name: Prepare update-assets.zip
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p update_assets_temp renamed
+          echo "Downloading assets from release ${{ steps.get_base_release.outputs.base_release }}"
+          gh release download "${{ steps.get_base_release.outputs.base_release }}" \
+            --repo ${{ github.repository }} \
+            --pattern "update-assets.zip" \
+            -D update_assets_temp
+
+          unzip -q update_assets_temp/update-assets.zip -d update_assets_temp
+          cd update_assets_temp
+          zip -r ../renamed/update-assets.zip assets
+          cd ..
+
+      - name: Create GitHub Release with Assets
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.event.inputs.tag_name }}
+          name: Release ${{ github.event.inputs.tag_name }}
+          draft: true
+          prerelease: ${{ github.event.inputs.prerelease }}
+          generate_release_notes: true
+          files: |
+            renamed/Codename Engine-Windows.zip
+            renamed/update-windows.exe
+            renamed/Codename Engine-Mac.zip
+            renamed/Codename Engine-Mac.tar.gz
+            renamed/update-mac
+            renamed/Codename Engine-Linux.zip
+            renamed/update-linux
+            renamed/update-assets.zip
